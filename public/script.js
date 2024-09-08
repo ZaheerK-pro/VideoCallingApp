@@ -10,10 +10,45 @@ const downloadLink = document.getElementById("download-link");
 const yourRecordingsButton = document.querySelector(".your_recrodings");
 myVideo.muted = true;
 
-const user = prompt("Enter your name");
-welcomeMessage.innerText = `Welcome, ${user}`;
-welcomeMessage.style.color = "white";
+window.onload = function () {
+  const modal = document.getElementById("username-modal");
+  const submitButton = document.getElementById("submit-username");
+  const cancelButton = document.getElementById("cancel-username");
+  const usernameInput = document.getElementById("username-input");
+  const welcomeMessage = document.getElementById("welcome-message");
+  const toast = document.getElementById("toast");
 
+  modal.style.display = "flex";
+
+  // Submit button logic
+  submitButton.addEventListener("click", () => {
+    const user = usernameInput.value.trim();
+    if (user) {
+      welcomeMessage.innerText = `Welcome, ${user}`;
+      welcomeMessage.style.color = "white";
+      modal.style.display = "none"; // Hide modal
+      document.body.classList.remove("blur-background"); // Remove blur if added
+    } else {
+      showToast("Please enter a valid name");
+    }
+  });
+
+  // Cancel button logic
+  cancelButton.addEventListener("click", () => {
+    showToast();
+  });
+
+  // Function to show the toast message
+  function showToast(message) {
+    toast.textContent = message; // Set custom message for the toast
+    toast.className = "toast show";
+    setTimeout(() => {
+      toast.className = toast.className.replace("show", "");
+    }, 3000); // Show toast for 3 seconds
+  }
+};
+
+// Initialize peer connection and handle video streams
 var peer = new Peer({
   host: "127.0.0.1",
   port: 3030,
@@ -24,6 +59,7 @@ let myVideoStream;
 let mediaRecorder;
 let recordedChunks = [];
 let isRecording = false; // Flag to track recording state
+let audioContext, audioAnalyser, microphone, dataArray, audioStream;
 
 navigator.mediaDevices
   .getUserMedia({
@@ -33,6 +69,20 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, stream);
+
+    // Setup the audio context and analyser for detecting sound levels
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    audioAnalyser = audioContext.createAnalyser();
+    microphone = audioContext.createMediaStreamSource(stream);
+    microphone.connect(audioAnalyser);
+    audioAnalyser.fftSize = 256;
+    const bufferLength = audioAnalyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    // Start detecting sound levels and apply a border to the video
+    detectSound(myVideo);
+
+    // Recording logic
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.onstop = () => {
       const blob = new Blob(recordedChunks, { type: "video/webm" });
@@ -87,6 +137,27 @@ navigator.mediaDevices
       connectToNewUser(userId, stream);
     });
   });
+
+// Detect sound levels and apply a border to the video if audio level is above a threshold
+const detectSound = (videoElement) => {
+  const threshold = 20; // Adjust this value based on your testing for sound sensitivity
+
+  const updateSoundLevel = () => {
+    audioAnalyser.getByteFrequencyData(dataArray);
+
+    const volume = dataArray.reduce((acc, val) => acc + val, 0) / dataArray.length;
+
+    if (volume > threshold) {
+      videoElement.classList.add("video-active-sound");
+    } else {
+      videoElement.classList.remove("video-active-sound");
+    }
+
+    requestAnimationFrame(updateSoundLevel);
+  };
+
+  updateSoundLevel();
+};
 
 const connectToNewUser = (userId, stream) => {
   console.log("I call someone" + userId);
@@ -161,13 +232,4 @@ disconnectBtn.addEventListener("click", () => {
   }
   socket.emit("disconnect");
   window.location.href = "https://www.google.com";
-});
-
-// Your Recordings
-yourRecordingsButton.addEventListener("click", () => {
-  if (recordingContainer.style.display === "none") {
-    recordingContainer.style.display = "block";
-  } else {
-    recordingContainer.style.display = "none";
-  }
 });

@@ -15,52 +15,75 @@
 </head>
 
 <body>
-  <div class="header">
-    <div class="logo">
-      <div class="header_back">
-        <i class="fas fa-angle-left"></i>
+  <!-- Modal for Username Input -->
+  <div id="username-modal" class="modal">
+    <div class="modal-content">
+      <h2>Enter your name</h2>
+      <input type="text" id="username-input" placeholder="Your Name" />
+      <div class="modal-buttons">
+        <button id="submit-username">Submit</button>
+        <button id="cancel-username">Cancel</button>
       </div>
-      <div id="welcome-message" class="welcome-message"></div>
     </div>
   </div>
-  <div class="main">
-    <div class="main_left">
-      <div class="videos_group">
-        <div id="video-grid"></div>
+
+  <!-- Main App Content Wrapper for Blurring -->
+  <div id="app-content">
+    <div class="header">
+      <div class="logo">
+        <div class="header_back">
+          <i class="fas fa-angle-left"></i>
+        </div>
+        <div id="welcome-message" class="welcome-message"></div>
       </div>
-      <div class="options">
-        <div class="options_left">
-          <div id="stopVideo" class="options_button">
-            <i class="fa fa-video-camera"></i>
+    </div>
+
+    <div class="main">
+      <div class="main_left">
+        <div class="videos_group">
+          <div id="video-grid"></div>
+        </div>
+
+        <div class="options">
+          <div class="options_left">
+            <div id="stopVideo" class="options_button">
+              <i class="fa fa-video-camera"></i>
+            </div>
+            <div id="muteButton" class="options_button">
+              <i class="fa fa-microphone"></i>
+            </div>
+            <div id="disconnect" class="options_button background_red">
+              <i class="fa fa-phone"></i>
+            </div>
           </div>
-          <div id="muteButton" class="options_button">
-            <i class="fa fa-microphone"></i>
-          </div>
-          <div id="disconnect" class="options_button background_red">
-            <i class="fa fa-phone"></i>
+
+          <div class="options_right">
+            <div id="inviteButton" class="options_button">
+              <i class="fas fa-user-plus"></i>
+            </div>
+            <div id="start-recording" class="options_button">
+              <i class="fas fa-record-vinyl"></i>
+            </div>
+            <div id="stop-recording" class="options_button" style="display: none;">
+              <i class="fas fa-stop"></i>
+            </div>
           </div>
         </div>
-        <div class="options_right">
-          <div id="inviteButton" class="options_button">
-            <i class="fas fa-user-plus"></i>
-          </div>
-          <div id="start-recording" class="options_button">
-            <i class="fas fa-record-vinyl"></i>
-          </div>
-          <div id="stop-recording" class="options_button" style="display: none;">
-            <i class="fas fa-stop"></i>
-          </div>
-        </div>
+      </div>
+    </div>
+
+    <!-- Video Recording  -->
+    <div class="recoding_main_container">
+      <div id="recording-container" style="display: none; width: 1100px; margin:auto;">
+        <video id="recorded-video" controls style="width: 100%; height: auto;"></video>
+        <a id="download-link" href="#" download="recording.webm">Download Your Recording</a>
       </div>
     </div>
   </div>
-  <!-- Video Recording  -->
-  <div class="recoding_main_container">
-    <div id="recording-container" style="display: none; width: 1100px; margin:auto;">
-      <video id="recorded-video" controls style="width: 100%; height: auto;"></video>
-      <a id="download-link" href="#" download="recording.webm">Download Your Recording</a>
-    </div>
-  </div>
+
+  <!-- Toast for displaying messages -->
+  <div id="toast" class="toast">Please enter your username to enter</div>
+
   <script src="script.js"></script>
 </body>
 
